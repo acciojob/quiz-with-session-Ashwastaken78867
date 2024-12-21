@@ -1,4 +1,5 @@
 //your JS code here.
+const userAnswers = {};
 function calculateScore() {
 	let score = 0;
 	for(let i=0; i< questions.length; i++){
