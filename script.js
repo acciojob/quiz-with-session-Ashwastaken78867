@@ -98,3 +98,4 @@ document.getElementById("submit").addEventListener("click", calculateScore);
 
 // Render questions on page load
 renderQuestions();
+
