@@ -39,24 +39,27 @@ function renderQuestions() {
   for (let i = 0; i < questions.length; i++) {
     const question = questions[i];
     const questionElement = document.createElement("div");
-    const questionText = document.createTextNode(question.question);
+    questionElement.style.marginBottom = "20px";
+
+    const questionText = document.createElement("p");
+    questionText.textContent = question.question;
     questionElement.appendChild(questionText);
 
     for (let j = 0; j < question.choices.length; j++) {
       const choice = question.choices[j];
+
+      const choiceLabel = document.createElement("label");
+      choiceLabel.style.marginRight = "10px";
+
       const choiceElement = document.createElement("input");
       choiceElement.setAttribute("type", "radio");
       choiceElement.setAttribute("name", `question-${i}`);
       choiceElement.setAttribute("value", choice);
 
-      // Add event listener to set "checked" attribute when clicked
-      choiceElement.addEventListener("click", (event) => {
-        event.target.setAttribute("checked", "true");
-      });
+      choiceLabel.appendChild(choiceElement);
+      choiceLabel.appendChild(document.createTextNode(choice));
 
-      const choiceText = document.createTextNode(choice);
-      questionElement.appendChild(choiceElement);
-      questionElement.appendChild(choiceText);
+      questionElement.appendChild(choiceLabel);
     }
 
     questionsElement.appendChild(questionElement);
@@ -95,4 +98,3 @@ document.getElementById("submit").addEventListener("click", calculateScore);
 
 // Render questions on page load
 renderQuestions();
-
