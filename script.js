@@ -1,4 +1,14 @@
 //your JS code here.
+function calculateScore() {
+	let score = 0;
+	for(let i=0; i< questions.length; i++){
+		if(userAnswers[`question-${i}`] === questions[i].answer){
+			score++;
+		}
+	}
+	localStorage.setItem("score", score);
+	alert(`Your score is ${score} out of ${questions.length}.`);
+}
 
 // Do not change code below this line
 // This code will just display the questions to the screen
