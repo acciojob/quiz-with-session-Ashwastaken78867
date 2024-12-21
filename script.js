@@ -1,101 +1,81 @@
-// Questions data
 const questions = [
-  {
-    question: "What is the capital of France?",
-    choices: ["Paris", "London", "Berlin", "Madrid"],
-    answer: "Paris",
-  },
-  {
-    question: "What is the highest mountain in the world?",
-    choices: ["Everest", "Kilimanjaro", "Denali", "Matterhorn"],
-    answer: "Everest",
-  },
-  {
-    question: "What is the largest country by area?",
-    choices: ["Russia", "China", "Canada", "United States"],
-    answer: "Russia",
-  },
-  {
-    question: "Which is the largest planet in our solar system?",
-    choices: ["Earth", "Jupiter", "Mars"],
-    answer: "Jupiter",
-  },
-  {
-    question: "What is the capital of Canada?",
-    choices: ["Toronto", "Montreal", "Vancouver", "Ottawa"],
-    answer: "Ottawa",
-  },
+  { question: "What is the capital of France?", choices: ["Paris", "London", "Berlin", "Madrid"], answer: "Paris" },
+  { question: "What is the highest mountain in the world?", choices: ["Everest", "Kilimanjaro", "Denali", "Matterhorn"], answer: "Everest" },
+  { question: "What is the largest country by area?", choices: ["Russia", "China", "Canada", "United States"], answer: "Russia" },
+  { question: "Which is the largest planet in our solar system?", choices: ["Earth", "Jupiter", "Mars"], answer: "Jupiter" },
+  { question: "What is the capital of Canada?", choices: ["Toronto", "Montreal", "Vancouver", "Ottawa"], answer: "Ottawa" }
 ];
 
-// Function to render questions on the screen
+const questionsElement = document.getElementById('questions');
+const scoreElement = document.getElementById('score');
+const submitButton = document.getElementById('submit');
+
+// Function to render questions and choices
 function renderQuestions() {
-  const questionsElement = document.getElementById("questions");
+  const savedAnswers = JSON.parse(sessionStorage.getItem('progress')) || [];
 
-  if (!questionsElement) {
-    console.error("Error: questionsElement is not defined. Make sure there is a container with id 'questions' in your HTML.");
-    return;
-  }
+  questions.forEach((question, index) => {
+    const questionDiv = document.createElement('div');
+    questionDiv.classList.add('question');
 
-  for (let i = 0; i < questions.length; i++) {
-    const question = questions[i];
-    const questionElement = document.createElement("div");
-    questionElement.style.marginBottom = "20px";
+    const questionTitle = document.createElement('p');
+    questionTitle.textContent = question.question;
+    questionDiv.appendChild(questionTitle);
 
-    const questionText = document.createElement("p");
-    questionText.textContent = question.question;
-    questionElement.appendChild(questionText);
+    question.choices.forEach(choice => {
+      const choiceLabel = document.createElement('label');
+      const choiceInput = document.createElement('input');
+      choiceInput.type = 'radio';
+      choiceInput.name = `question-${index}`;
+      choiceInput.value = choice;
 
-    for (let j = 0; j < question.choices.length; j++) {
-      const choice = question.choices[j];
+      // If there's a saved answer, mark the radio button as selected
+      if (savedAnswers[index] === choice) {
+        choiceInput.checked = true;
+      }
 
-      const choiceLabel = document.createElement("label");
-      choiceLabel.style.marginRight = "10px";
-
-      const choiceElement = document.createElement("input");
-      choiceElement.setAttribute("type", "radio");
-      choiceElement.setAttribute("name", `question-${i}`);
-      choiceElement.setAttribute("value", choice);
-
-      choiceLabel.appendChild(choiceElement);
+      choiceLabel.appendChild(choiceInput);
       choiceLabel.appendChild(document.createTextNode(choice));
+      questionDiv.appendChild(choiceLabel);
+    });
 
-      questionElement.appendChild(choiceLabel);
-    }
-
-    questionsElement.appendChild(questionElement);
-  }
+    questionsElement.appendChild(questionDiv);
+  });
 }
 
-// Function to calculate score
-function calculateScore() {
-  let score = 0;
+// Function to save progress to sessionStorage
+function saveProgress() {
   const selectedAnswers = [];
 
-  for (let i = 0; i < questions.length; i++) {
-    const selectedAnswer = document.querySelector(`input[name="question-${i}"]:checked`);
+  questions.forEach((_, index) => {
+    const selectedOption = document.querySelector(`input[name="question-${index}"]:checked`);
+    selectedAnswers.push(selectedOption ? selectedOption.value : null);
+  });
 
-    if (selectedAnswer) {
-      selectedAnswers.push(selectedAnswer.value);
-      if (selectedAnswer.value === questions[i].answer) {
-        score++;
-      }
-    }
-  }
-
-  // Store selected answers in sessionStorage and score in localStorage
-  sessionStorage.setItem("selectedAnswers", JSON.stringify(selectedAnswers));
-  localStorage.setItem("score", score);
-
-  // Display score in the score div
-  const scoreElement = document.getElementById("score");
-  if (scoreElement) {
-    scoreElement.textContent = `Your score is ${score} out of ${questions.length}.`;
-  }
+  sessionStorage.setItem('progress', JSON.stringify(selectedAnswers));
 }
 
-// Attach event listener to the submit button
-document.getElementById("submit").addEventListener("click", calculateScore);
+// Function to calculate and display the score
+function calculateScore() {
+  let score = 0;
 
-// Render questions on page load
+  questions.forEach((question, index) => {
+    const selectedOption = document.querySelector(`input[name="question-${index}"]:checked`);
+    if (selectedOption && selectedOption.value === question.answer) {
+      score++;
+    }
+  });
+
+  localStorage.setItem('score', score);
+  scoreElement.textContent = `Your score is ${score} out of ${questions.length}.`;
+}
+
+// Event listener for submit button
+submitButton.addEventListener('click', () => {
+  calculateScore();
+  saveProgress();
+});
+
+// Render questions when the page loads
 renderQuestions();
 
